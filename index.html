@@ -316,32 +316,41 @@
             serverTimestamp 
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
-        // Uncomment setLogLevel('Debug'); for detailed console logging for Firebase
-        // import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        // setLogLevel('Debug'); 
-
-        let db;
-        let auth;
-        let userId = 'anonymous'; // Default ID
-        let RESEARCHER_USER_ID = null; // Stored ID of the user who owns this app (Renee)
-        
+        // --- Firebase Configuration Variables ---
+        // These variables are provided by the canvas environment.
         const APP_ID = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const FIREBASE_CONFIG = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        // Parse the config if it exists and is a non-empty string
+        let FIREBASE_CONFIG = null;
+        try {
+            if (typeof __firebase_config !== 'undefined' && __firebase_config && __firebase_config.trim() !== '') {
+                FIREBASE_CONFIG = JSON.parse(__firebase_config);
+            }
+        } catch (e) {
+            console.error("Failed to parse Firebase configuration:", e);
+        }
+        
         const INITIAL_AUTH_TOKEN = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
         
         // **MANDATORY PUBLIC COLLECTION PATH**
         const COLLECTION_PATH = `/artifacts/${APP_ID}/public/data/survey_responses`;
+
+        // Global Firebase state
+        let db;
+        let auth;
+        let userId = 'anonymous'; // Default ID
+        let RESEARCHER_USER_ID = null; // Stored ID of the user who owns this app (Renee)
         let isAuthReady = false;
 
         // UI elements
         const surveyContainer = document.getElementById('sandDollarSurveyForm');
         const viewResultsButton = document.getElementById('viewResultsButton');
-        
-        // Create results container dynamically and append it
-        const resultsContainer = document.createElement('div');
-        resultsContainer.id = 'survey-results-container';
-        resultsContainer.className = 'hidden mt-10'; 
-        document.querySelector('.max-w-3xl.mx-auto').appendChild(resultsContainer);
+        const resultsContainer = document.getElementById('survey-results-container') || (() => {
+            const container = document.createElement('div');
+            container.id = 'survey-results-container';
+            container.className = 'hidden mt-10'; 
+            document.querySelector('.max-w-3xl.mx-auto').appendChild(container);
+            return container;
+        })();
         
         const messageBox = document.getElementById('messageBox');
         const messageText = document.getElementById('messageText');
@@ -363,6 +372,7 @@
             messageText.textContent = message;
             messageSubText.textContent = subText;
             messageSubText.classList.remove('hidden');
+            messageBox.classList.remove('hidden');
         }
 
         // Function to control access to the results button
