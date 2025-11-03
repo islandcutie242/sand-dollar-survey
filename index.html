@@ -304,7 +304,6 @@
         import { 
             getAuth, 
             signInAnonymously, 
-            signInWithCustomToken, 
             onAuthStateChanged 
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { 
@@ -316,29 +315,33 @@
             serverTimestamp 
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
-        // --- Firebase Configuration Variables ---
-        // These variables are provided by the canvas environment.
-        const APP_ID = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        // Parse the config if it exists and is a non-empty string
-        let FIREBASE_CONFIG = null;
-        try {
-            if (typeof __firebase_config !== 'undefined' && __firebase_config && __firebase_config.trim() !== '') {
-                FIREBASE_CONFIG = JSON.parse(__firebase_config);
-            }
-        } catch (e) {
-            console.error("Failed to parse Firebase configuration:", e);
-        }
+        // =========================================================================
+        // !!! IMPORTANT: EXTERNAL DEPLOYMENT CONFIGURATION !!!
+        // This object contains your unique Firebase keys for connecting to Firestore.
+        // =========================================================================
+
+        const FIREBASE_CONFIG = {
+            apiKey: "***REMOVED***",
+            authDomain: "sanddollarsurvey2025.firebaseapp.com",
+            projectId: "sanddollarsurvey2025",
+            storageBucket: "sanddollarsurvey2025.firebasestorage.app",
+            messagingSenderId: "980365100199",
+            appId: "1:980365100199:web:5929df6358a25057e78782",
+            measurementId: "G-ECY2YFY394"
+        };
         
-        const INITIAL_AUTH_TOKEN = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        // The Project ID is used to define the unique collection path structure
+        const APP_ID = FIREBASE_CONFIG.projectId; 
         
         // **MANDATORY PUBLIC COLLECTION PATH**
+        // This path must match the one secured in your Firestore Rules 
         const COLLECTION_PATH = `/artifacts/${APP_ID}/public/data/survey_responses`;
 
         // Global Firebase state
         let db;
         let auth;
-        let userId = 'anonymous'; // Default ID
-        let RESEARCHER_USER_ID = null; // Stored ID of the user who owns this app (Renee)
+        let userId = null; // Will be set by onAuthStateChanged
+        let RESEARCHER_USER_ID = null; // Stored user ID to identify the researcher
         let isAuthReady = false;
 
         // UI elements
@@ -362,322 +365,291 @@
         function showMessage(type, message, subText = '') {
             messageBox.classList.remove('hidden', 'bg-red-100', 'border-red-500', 'text-red-700', 'bg-yellow-100', 'border-yellow-500', 'text-yellow-700', 'bg-green-100', 'border-green-500', 'text-green-700');
             
+            // Set the correct colors
             if (type === 'success') {
-                messageBox.classList.add('bg-green-100', 'border-green-500', 'text-green-700');
+                messageBox.classList.add('bg-green-100', 'border-green-500', 'text-green-700', 'border-l-4');
             } else if (type === 'error') {
-                messageBox.classList.add('bg-red-100', 'border-red-500', 'text-red-700');
-            } else { // warning
-                messageBox.classList.add('bg-yellow-100', 'border-yellow-500', 'text-yellow-700');
+                messageBox.classList.add('bg-red-100', 'border-red-500', 'text-red-700', 'border-l-4');
+            } else {
+                messageBox.classList.add('bg-yellow-100', 'border-yellow-500', 'text-yellow-700', 'border-l-4');
             }
+
             messageText.textContent = message;
             messageSubText.textContent = subText;
-            messageSubText.classList.remove('hidden');
+            messageSubText.classList.toggle('hidden', subText === '');
             messageBox.classList.remove('hidden');
-        }
 
-        // Function to control access to the results button
-        function checkPermissions() {
-            // Only show the results button if the current user is the researcher
-            if (userId === RESEARCHER_USER_ID) {
-                viewResultsButton.classList.remove('hidden'); 
-                console.log("Access Granted: Researcher View Enabled.");
-            } else {
-                viewResultsButton.classList.add('hidden');
-                console.log("Access Denied: Hiding Results Button for participant.");
+            // Hide after 7 seconds for non-error messages
+            if (type !== 'error') {
+                setTimeout(() => messageBox.classList.add('hidden'), 7000);
             }
         }
-        
+
         function switchView(view) {
             if (view === 'survey') {
                 surveyContainer.classList.remove('hidden');
                 resultsContainer.classList.add('hidden');
-                
-                // Update button styles: survey button active, results button inactive
-                if (userId === RESEARCHER_USER_ID) {
-                    viewResultsButton.classList.remove('bg-blue-600', 'text-white', 'shadow-lg', 'shadow-blue-500/50');
-                    viewResultsButton.classList.add('bg-gray-200', 'text-gray-800', 'shadow-md');
-                }
-                
-                const submitButton = document.getElementById('submitButton');
-                if (submitButton.textContent !== "Survey Completed") {
-                    submitButton.classList.add('bg-blue-600', 'text-white', 'shadow-lg', 'shadow-blue-500/50');
-                }
-                
-            } else if (view === 'results' && userId === RESEARCHER_USER_ID) {
+                document.querySelector('header h1').textContent = "Sand Dollar Consumer Adoption Survey";
+                viewResultsButton.textContent = "View Live Results (Researcher Only)";
+                viewResultsButton.onclick = () => switchView('results');
+            } else if (view === 'results') {
                 surveyContainer.classList.add('hidden');
                 resultsContainer.classList.remove('hidden');
-                
-                // Update button styles: results button active, survey button inactive
-                viewResultsButton.classList.add('bg-blue-600', 'text-white', 'shadow-lg', 'shadow-blue-500/50');
-                viewResultsButton.classList.remove('bg-gray-200', 'text-gray-800', 'shadow-md');
-                document.getElementById('submitButton').classList.remove('bg-blue-600', 'text-white', 'shadow-lg', 'shadow-blue-500/50');
-                
-                messageBox.classList.add('hidden'); // Hide general message box when viewing results
-                fetchAndDisplayResults();
+                document.querySelector('header h1').textContent = "Survey Results Dashboard";
+                viewResultsButton.textContent = "Return to Survey Form";
+                viewResultsButton.onclick = () => switchView('survey');
             }
         }
-        
-        // --- Firebase Initialization and Auth ---
 
-        if (FIREBASE_CONFIG) {
+        // --- Firebase Initialization and Authentication ---
+
+        function initializeFirebase() {
             try {
                 const app = initializeApp(FIREBASE_CONFIG);
                 db = getFirestore(app);
                 auth = getAuth(app);
                 
+                // If a researcher ID has been stored previously, retrieve it
+                RESEARCHER_USER_ID = localStorage.getItem('researcher_user_id');
+
                 onAuthStateChanged(auth, async (user) => {
                     if (user) {
                         userId = user.uid;
-                        isAuthReady = true;
                         
-                        // Set the researcher ID only on initial authentication (this is Renee's ID)
+                        // Check if this is the first time the app is run by the researcher
                         if (!RESEARCHER_USER_ID) {
-                            RESEARCHER_USER_ID = user.uid;
+                            RESEARCHER_USER_ID = userId;
+                            localStorage.setItem('researcher_user_id', userId);
+                            console.log("Researcher ID set:", RESEARCHER_USER_ID);
                         }
-                        
-                        console.log(`Firebase authenticated. Current User ID: ${userId}. Researcher ID: ${RESEARCHER_USER_ID}`);
-                        checkPermissions(); // Check and display the button if needed
-                        switchView('survey'); 
-                    } else {
-                        // Sign in anonymously if no user is present
-                        if (INITIAL_AUTH_TOKEN) {
-                            await signInWithCustomToken(auth, INITIAL_AUTH_TOKEN);
+
+                        // Show results button if the logged-in user matches the researcher ID
+                        if (userId === RESEARCHER_USER_ID) {
+                            viewResultsButton.classList.remove('hidden');
                         } else {
-                            await signInAnonymously(auth);
+                            // If user is logged in, but not the researcher, hide results view
+                            viewResultsButton.classList.add('hidden');
                         }
+                    } else {
+                        // Sign in anonymously to ensure everyone can submit data
+                        await signInAnonymously(auth);
+                    }
+                    isAuthReady = true;
+                    // Start listening for data only after auth is ready
+                    if (userId === RESEARCHER_USER_ID) {
+                        setupRealtimeResults();
                     }
                 });
 
-            } catch (error) {
-                console.error("Firebase initialization failed:", error);
-                showMessage('error', `Error initializing Firebase: ${error.message}. Data saving is disabled.`, "Please check your console for details.");
+            } catch (e) {
+                showMessage('error', 'Firebase Initialization Error', 'Could not connect to the database. Check your API keys and console logs for details.');
+                console.error("Firebase Init Error: ", e);
             }
-        } else {
-            isAuthReady = true; 
-            console.warn("Firebase config not available. Data will not be saved persistently.");
-            showMessage('warning', "Firestore is unavailable.", "Data will only be logged to the console.");
-            switchView('survey'); 
         }
 
         // --- Data Submission Logic ---
 
-        const handleSubmit = async (event) => {
-            event.preventDefault();
+        surveyContainer.addEventListener('submit', async (e) => {
+            e.preventDefault();
 
-            if (!isAuthReady) {
-                showMessage('warning', "Please wait, authentication is still loading. Try again in a moment.", "");
+            // Check consent first
+            const consentValue = document.querySelector('input[name="consent"]:checked')?.value;
+            if (consentValue === 'No') {
+                showMessage('info', 'Thank you for your time!', 'You have opted not to participate in the survey.');
                 return;
             }
 
-            const form = event.target;
-            
-            const consentValue = form.elements['consent'].value;
-            if (consentValue !== 'Yes') {
-                showMessage('error', "You must consent to participate to submit the survey.", "Select 'Yes, I consent to participate'.");
+            if (!isAuthReady || !db) {
+                showMessage('error', 'Connection not ready.', 'Please wait a moment and try submitting again.');
                 return;
             }
-
-            const getRadioValue = (name) => {
-                const element = form.elements[name];
-                if (element) {
-                    return element.value;
-                }
-                return null;
-            };
-
-            const formData = {
-                // Metadata
-                user_id: userId,
-                timestamp: db ? serverTimestamp() : new Date().toISOString(),
-                
-                // Researcher Info (for context)
-                researcher: "Renee Darling Neymour",
-                class: "BUSI-951-01 Introduction to Financial Technologies (FinTech) in Financial Services Fall 2025",
-                
-                // Consent & Demographics
-                consent: getRadioValue('consent'),
-                gender: getRadioValue('gender'),
-                age_range: getRadioValue('age'),
-                employment_status: getRadioValue('employment'),
-                education_level: getRadioValue('education'),
-
-                // Section 1: Barriers (Likert Scale: 1=Strongly Disagree, 5=Strongly Agree)
-                q1_preference_for_existing: getRadioValue('q1_preference'),
-                q2_merchant_acceptance: getRadioValue('q2_acceptance'),
-                q3_trust_and_privacy: getRadioValue('q3_trust'),
-
-                // Section 2: Incentives (Likert Scale: 1=Strongly Disagree, 5=Strongly Agree)
-                q4_general_receptivity: getRadioValue('q4_general_incentive'),
-                q5_specific_vat_credit_impact: getRadioValue('q5_vat_credit'),
-                q6_switching_behavior: getRadioValue('q6_switching'),
-                q7_importance_of_financial_benefit: getRadioValue('q7_importance'),
-            };
-
-            const requiredFields = [
-                'consent', 'gender', 'age', 'employment', 'education', 
-                'q1_preference', 'q2_acceptance', 'q3_trust', 
-                'q4_general_incentive', 'q5_vat_credit', 'q6_switching', 'q7_importance'
-            ];
-            
-            let allRequiredFilled = true;
-            for (const fieldName of requiredFields) {
-                if (!getRadioValue(fieldName)) {
-                    allRequiredFilled = false;
-                    break;
-                }
-            }
-
-            if (!allRequiredFilled) {
-                showMessage('warning', "Please answer all questions before submitting.", "");
-                return;
-            }
-            
-            document.getElementById('submitButton').textContent = "Submitting...";
-            document.getElementById('submitButton').disabled = true;
 
             try {
-                if (db) {
-                    const docRef = await addDoc(collection(db, COLLECTION_PATH), formData);
-                    console.log(`Document written with ID: ${docRef.id} in collection: ${COLLECTION_PATH}`);
-                    showMessage('success', `Thank you for your participation! Your response is recorded.`, `Document ID: ${docRef.id} in ${COLLECTION_PATH}`);
-                } else {
-                    console.warn("Firestore not available. Logging to console only.");
-                    console.log(JSON.stringify(formData, null, 2));
-                    showMessage('warning', "Firestore is unavailable.", "Data was logged to the console, not saved.");
-                }
-                
-                // Disable form elements after submission
-                form.querySelectorAll('input').forEach(input => input.disabled = true);
-                document.getElementById('submitButton').textContent = "Survey Completed";
+                const formData = new FormData(e.target);
+                const responseData = {
+                    submittedBy: userId, // Anonymous or Researcher ID
+                    timestamp: serverTimestamp(),
+                    // Demographics
+                    consent: formData.get('consent'),
+                    gender: formData.get('gender'),
+                    age: formData.get('age'),
+                    employment: formData.get('employment'),
+                    education: formData.get('education'),
+                    // Barriers (Likert 1-5)
+                    q1_preference: parseInt(formData.get('q1_preference')),
+                    q2_acceptance: parseInt(formData.get('q2_acceptance')),
+                    q3_trust: parseInt(formData.get('q3_trust')),
+                    // Incentives (Likert 1-5)
+                    q4_general_incentive: parseInt(formData.get('q4_general_incentive')),
+                    q5_vat_credit: parseInt(formData.get('q5_vat_credit')),
+                    q6_switching: parseInt(formData.get('q6_switching')),
+                    q7_importance: parseInt(formData.get('q7_importance')),
+                };
 
-            } catch (e) {
-                console.error("Error adding document: ", e);
-                showMessage('error', `Error submitting survey: ${e.message}`, "Please try refreshing the page.");
+                await addDoc(collection(db, COLLECTION_PATH), responseData);
                 
-                // Re-enable form elements on error
-                form.querySelectorAll('input').forEach(input => input.disabled = false);
-                document.getElementById('submitButton').textContent = "Submit Survey";
-                document.getElementById('submitButton').disabled = false;
+                showMessage('success', 'Survey Submitted Successfully!', 'Thank you for your valuable contribution to the research.');
+                e.target.reset(); // Clear the form after submission
+
+            } catch (error) {
+                showMessage('error', 'Submission Failed', `There was an error saving your response: ${error.message}.`);
+                console.error("Error submitting document: ", error);
             }
+        });
+
+        // --- Live Results Dashboard Logic ---
+
+        const questionMapping = {
+            // Demographics
+            gender: "A. Gender", age: "B. Age Range", employment: "C. Employment Status", education: "D. Education",
+            // Barriers
+            q1_preference: "1. Preference for Existing Methods", q2_acceptance: "2. Merchant Acceptance", q3_trust: "3. Trust and Privacy",
+            // Incentives
+            q4_general_incentive: "4. General Receptivity", q5_vat_credit: "5. Specific VAT Credit Impact", q6_switching: "6. Switching Behavior", q7_importance: "7. Importance of Financial Benefit",
         };
 
-        // Attach event listener to the form's submit event
-        document.getElementById('sandDollarSurveyForm').addEventListener('submit', handleSubmit);
+        const likertLabels = { 1: 'Strongly Disagree', 2: 'Disagree', 3: 'Neutral', 4: 'Agree', 5: 'Strongly Agree' };
+        const likertKeys = ['q1_preference', 'q2_acceptance', 'q3_trust', 'q4_general_incentive', 'q5_vat_credit', 'q6_switching', 'q7_importance'];
 
-        // Make switchView globally accessible via the window object for inline onclick
-        window.switchView = switchView;
-        
-        // --- Data Retrieval Logic (View Results) ---
 
-        function fetchAndDisplayResults() {
-            // Re-check permission just in case
-            if (userId !== RESEARCHER_USER_ID) {
-                resultsContainer.innerHTML = '<div class="p-6 mt-6 bg-red-100 border-l-4 border-red-500 text-red-700 rounded-lg"><p class="text-center font-medium">Access Denied: Only the researcher can view these results.</p></div>';
-                return;
-            }
-            
-            if (!isAuthReady || !db) {
-                resultsContainer.innerHTML = '<div class="p-6 mt-6 bg-red-100 border-l-4 border-red-500 text-red-700 rounded-lg"><p class="text-center font-medium">Database not initialized or authentication pending. Please wait.</p></div>';
-                return;
-            }
+        function calculateResults(responses) {
+            const results = {
+                totalResponses: responses.length,
+                demographics: {},
+                likert: {},
+                averageLikert: 0,
+            };
 
-            resultsContainer.innerHTML = `
-                <div class="border-b pb-4 mb-4">
-                    <button class="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-300" onclick="switchView('survey')">
-                        &larr; Return to Survey
-                    </button>
-                    <h3 class="text-2xl font-bold text-gray-800 mt-4">Live Survey Results</h3>
-                    <p class="text-sm text-gray-600">
-                        Collection: 
-                        <span class="font-mono text-xs p-1 bg-gray-100 rounded">${COLLECTION_PATH.split('/').slice(-1).pop()}</span> 
-                        | Your Researcher ID: <span class="font-mono text-xs p-1 bg-gray-100 rounded">${userId}</span>
-                    </p>
-                </div>
-                <div id="resultsTableWrapper" class="overflow-x-auto relative shadow-md sm:rounded-lg">
-                    <p class="text-center p-6 text-gray-500" id="loadingMessage">Loading real-time results...</p>
-                </div>
-            `;
-            
-            const resultsTableWrapper = document.getElementById('resultsTableWrapper');
-            const loadingMessage = document.getElementById('loadingMessage');
+            const allLikertScores = [];
 
-            const q = query(collection(db, COLLECTION_PATH));
-
-            // Set up real-time listener
-            onSnapshot(q, (querySnapshot) => {
-                const submissions = [];
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    // Convert Firestore timestamp to a readable string if available
-                    let dateStr = 'N/A';
-                    if (data.timestamp && data.timestamp.toDate) {
-                        dateStr = data.timestamp.toDate().toLocaleDateString('en-US', {
-                            month: 'short', 
-                            day: 'numeric', 
-                            hour: '2-digit', 
-                            minute: '2-digit'
-                        });
-                    }
-                    submissions.push({
-                        id: doc.id,
-                        date: dateStr,
-                        ...data
-                    });
+            responses.forEach(response => {
+                // Tally Demographics
+                ['gender', 'age', 'employment', 'education'].forEach(key => {
+                    const value = response[key] || 'N/A';
+                    results.demographics[key] = results.demographics[key] || { title: questionMapping[key], counts: {} };
+                    results.demographics[key].counts[value] = (results.demographics[key].counts[value] || 0) + 1;
                 });
 
-                if (loadingMessage) loadingMessage.classList.add('hidden');
+                // Tally Likert Responses
+                likertKeys.forEach(key => {
+                    const score = response[key];
+                    if (score) {
+                        allLikertScores.push(score);
+                        results.likert[key] = results.likert[key] || { title: questionMapping[key], counts: {} };
+                        
+                        // Map the number score to its label for display
+                        const label = likertLabels[score] || `Score ${score}`;
+                        results.likert[key].counts[label] = (results.likert[key].counts[label] || 0) + 1;
+                    }
+                });
+            });
 
-                if (submissions.length === 0) {
-                    resultsTableWrapper.innerHTML = '<p class="text-center p-6 text-gray-500 bg-white rounded-lg border">No submissions found yet. Be the first to submit!</p>';
-                    return;
+            // Calculate overall average Likert score
+            const sum = allLikertScores.reduce((acc, score) => acc + score, 0);
+            results.averageLikert = allLikertScores.length > 0 ? (sum / allLikertScores.length).toFixed(2) : 'N/A';
+
+            return results;
+        }
+
+        function renderResults(results) {
+            if (resultsContainer.classList.contains('hidden')) return; // Don't render if not visible
+
+            let html = `<h2 class="text-2xl font-extrabold text-blue-600 mb-4">Live Survey Data (${results.totalResponses} Responses)</h2>`;
+            
+            // 1. Overall Summary Card
+            html += `
+                <div class="bg-indigo-50 p-6 rounded-xl shadow-md mb-8">
+                    <p class="text-lg font-semibold text-indigo-800">Overall Likert Mean Score:</p>
+                    <p class="text-4xl font-bold text-indigo-900 mt-1">${results.averageLikert} / 5.00</p>
+                    <p class="text-sm text-indigo-600 mt-2">Based on all 7 Likert questions.</p>
+                </div>
+            `;
+
+            // 2. Likert Section
+            html += `<h3 class="text-xl font-bold text-gray-700 mb-4 border-t pt-4">Likert Questions Analysis</h3>`;
+            html += `<p class="text-sm text-gray-500 mb-6">Distribution of responses for adoption barriers and incentive receptivity.</p>`;
+
+            Object.keys(results.likert).forEach(key => {
+                const item = results.likert[key];
+                html += `<div class="mb-6 p-4 border border-gray-200 rounded-lg bg-white">
+                    <p class="font-semibold text-gray-800 mb-3">${item.title}</p>`;
+                
+                const sortedLabels = Object.keys(item.counts).sort((a, b) => {
+                    return likertLabels[a.match(/\d+/)?.[0]] > likertLabels[b.match(/\d+/)?.[0]] ? 1 : -1;
+                });
+
+                sortedLabels.forEach(label => {
+                    const count = item.counts[label];
+                    const percentage = ((count / results.totalResponses) * 100).toFixed(1);
+                    const isStrong = label.includes('Strongly');
+                    
+                    html += `
+                        <div class="flex items-center mb-1 text-sm">
+                            <span class="w-1/3 text-gray-600 ${isStrong ? 'font-medium' : ''}">${label}:</span>
+                            <div class="w-2/3 h-5 bg-gray-200 rounded-full">
+                                <div class="h-5 rounded-full ${isStrong ? 'bg-emerald-400' : 'bg-blue-400'}" style="width: ${percentage}%;"></div>
+                            </div>
+                            <span class="ml-2 text-xs font-semibold text-gray-700">${percentage}% (${count})</span>
+                        </div>`;
+                });
+                html += `</div>`;
+            });
+            
+            // 3. Demographics Section
+            html += `<h3 class="text-xl font-bold text-gray-700 mb-4 border-t pt-4">Demographic Breakdown</h3>`;
+            
+            Object.keys(results.demographics).forEach(key => {
+                const item = results.demographics[key];
+                html += `<div class="mb-6 p-4 border border-gray-200 rounded-lg bg-white">
+                    <p class="font-semibold text-gray-800 mb-3">${item.title}</p>`;
+                
+                Object.keys(item.counts).sort().forEach(label => {
+                    const count = item.counts[label];
+                    const percentage = ((count / results.totalResponses) * 100).toFixed(1);
+                    
+                    html += `
+                        <div class="flex items-center mb-1 text-sm">
+                            <span class="w-1/3 text-gray-600">${label}:</span>
+                            <div class="w-2/3 h-4 bg-gray-100 rounded-full">
+                                <div class="h-4 rounded-full bg-yellow-400" style="width: ${percentage}%;"></div>
+                            </div>
+                            <span class="ml-2 text-xs font-semibold text-gray-700">${percentage}% (${count})</span>
+                        </div>`;
+                });
+                html += `</div>`;
+            });
+
+            resultsContainer.innerHTML = html;
+        }
+
+        function setupRealtimeResults() {
+            if (!db) return;
+
+            const q = query(collection(db, COLLECTION_PATH));
+            
+            // Listen for real-time changes
+            onSnapshot(q, (snapshot) => {
+                const responses = [];
+                snapshot.forEach((doc) => {
+                    responses.push(doc.data());
+                });
+
+                if (responses.length > 0) {
+                    const results = calculateResults(responses);
+                    renderResults(results);
+                } else {
+                    resultsContainer.innerHTML = `<p class="text-lg text-gray-500 mt-6 p-4 bg-gray-50 rounded-lg">No survey responses received yet.</p>`;
                 }
-
-                // Define the display columns in order
-                const displayKeys = [
-                    { key: 'date', label: 'Date', width: 'min-w-[120px]' },
-                    { key: 'age_range', label: 'Age', width: 'min-w-[60px]' },
-                    { key: 'education_level', label: 'Education', width: 'min-w-[100px]' },
-                    { key: 'q3_trust_and_privacy', label: 'Q3 (Trust)', width: 'min-w-[70px]' },
-                    { key: 'q5_specific_vat_credit_impact', label: 'Q5 (VAT)', width: 'min-w-[70px]' },
-                    { key: 'q6_switching_behavior', label: 'Q6 (Switch)', width: 'min-w-[70px]' },
-                ];
-                
-                // Build the table HTML
-                let tableHTML = `
-                    <table class="w-full text-sm text-left text-gray-500">
-                        <thead class="text-xs text-gray-700 uppercase bg-gray-50">
-                            <tr>
-                                ${displayKeys.map(col => `<th scope="col" class="px-3 py-3 ${col.width}">${col.label}</th>`).join('')}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${submissions.map(sub => `
-                                <tr class="bg-white border-b hover:bg-gray-50">
-                                    ${displayKeys.map(col => {
-                                        let cellContent = sub[col.key];
-                                        if (col.key === 'id') {
-                                            cellContent = sub.id.substring(0, 8) + '...'; // Truncate ID
-                                        }
-                                        return `<td class="px-3 py-4 font-medium text-gray-900 whitespace-nowrap">${cellContent}</td>`;
-                                    }).join('')}
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                        <tfoot class="text-xs text-gray-700 uppercase bg-gray-50">
-                             <tr>
-                                <th scope="col" colspan="${displayKeys.length}" class="px-6 py-3 text-center bg-gray-50 font-bold text-gray-700">Total Responses: ${submissions.length}</th>
-                            </tr>
-                        </tfoot>
-                    </table>
-                `;
-                
-                resultsTableWrapper.innerHTML = tableHTML;
             }, (error) => {
-                console.error("Error fetching documents:", error);
-                if (loadingMessage) loadingMessage.classList.add('hidden');
-                resultsTableWrapper.innerHTML = `<p class="text-center p-6 text-red-600 bg-white rounded-lg border">Error loading data: ${error.message}</p>`;
+                console.error("Error setting up snapshot listener: ", error);
+                // The error is likely due to the researcher not being properly authenticated
+                resultsContainer.innerHTML = `<p class="text-lg text-red-500 mt-6 p-4 bg-red-50 rounded-lg border-l-4 border-red-500">Error loading results. Check your Firebase Security Rules and user status.</p>`;
             });
         }
+        
+        // --- Application Start ---
+
+        window.onload = initializeFirebase;
     </script>
 </body>
 </html>
