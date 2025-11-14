@@ -49,9 +49,9 @@
             <div class="mb-10 p-6 bg-blue-50 border-l-4 border-blue-500 rounded-lg">
                 <h2 class="text-xl font-semibold text-blue-800 mb-3">Introduction from the Researcher</h2>
                 <p class="text-gray-700 leading-relaxed">Dear Participant,</p>
-                <p class="text-gray-700 leading-relaxed mt-2">My name is <strong>Renee Darling Neymour</strong>, and I am a student in the <strong>BUSI-951-01 Introduction to Financial Technologies (FinTech) in Financial Services Fall 2025</strong> class.</p>
+                <p class="text-gray-700 leading-relaxed mt-2">My name is **Renee Darling Neymour**, and I am a student in the **BUSI-951-01 Introduction to Financial Technologies (FinTech) in Financial Services Fall 2025** class.</p>
                 <p class="text-gray-700 leading-relaxed mt-2">I am conducting this anonymous survey as part of an academic research project focused on digital currency adoption barriers in The Bahamas.</p>
-                <p class="text-gray-700 leading-relaxed mt-2 font-medium">Your participation is incredibly valuable. Please be assured that all responses are strictly confidential and the results will <strong>only</strong> be used for the purpose of this research paper.</p>
+                <p class="text-gray-700 leading-relaxed mt-2 font-medium">Your participation is incredibly valuable. Please be assured that all responses are strictly confidential and the results will **only** be used for the purpose of this research paper.</p>
                 <p class="text-gray-700 leading-relaxed mt-2">Thank you for taking the time to complete this survey.</p>
             </div>
 
@@ -77,8 +77,6 @@
                 <div id="surveyQuestions" class="hidden">
                     <section id="section-demographics">
                         <h3 class="text-xl font-bold text-gray-700 mb-4 border-t pt-6">Section 0: Demographic Information</h3>
-                        <p class="text-sm text-gray-600 mb-6">These questions help us understand if adoption barriers or incentives vary across different groups.</p>
-
                         <div class="mb-6">
                             <label class="block text-gray-800 font-semibold mb-3 required-field">A. Gender:</label>
                             <div class="flex flex-wrap gap-4">
@@ -152,8 +150,6 @@
 
                     <section id="section-barriers">
                         <h3 class="text-xl font-bold text-gray-700 mb-6 border-t pt-6">Section 1: Identifying Current Barriers (Likert Scale)</h3>
-                        <p class="text-sm text-gray-600 mb-8">These questions aim to understand why consumers aren't using the Sand Dollar right now.</p>
-
                         <div class="mb-8">
                             <label class="block text-lg font-medium text-gray-800 mb-4 required-field">1. Barrier - Preference for Existing Methods:</label>
                             <p class="text-sm text-gray-600 mb-4">"I rarely use the Sand Dollar because my existing payment methods (cash, debit/credit card) are more convenient."</p>
@@ -208,8 +204,6 @@
 
                     <section id="section-incentives">
                         <h3 class="text-xl font-bold text-gray-700 mb-6 border-t pt-6">Section 2: Measuring Receptivity to Financial Incentives (Likert Scale)</h3>
-                        <p class="text-sm text-gray-600 mb-8">These questions test whether financial incentives are the key missing piece for adoption.</p>
-
                         <div class="mb-8">
                             <label class="block text-lg font-medium text-gray-800 mb-4 required-field">4. Incentive - General Receptivity:</label>
                             <p class="text-sm text-gray-600 mb-4">"I would be significantly more motivated to use the Sand Dollar if it offered me a direct financial benefit (e.g., discounts, rewards)."</p>
@@ -316,7 +310,7 @@
             query, 
             onSnapshot, 
             serverTimestamp,
-            getDocs // <-- CHANGE 1: ADDED getDocs
+            getDocs 
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
         const FIREBASE_CONFIG = {
@@ -352,7 +346,7 @@
         const submitButton = document.getElementById('submitButton');
         const consentNo = document.getElementById('consent_no');
         const consentYes = document.getElementById('consent_yes');
-        const resultsContainer = document.getElementById('resultsContainer'); // <-- CHANGE 3: ADDED resultsContainer
+        const resultsContainer = document.getElementById('resultsContainer'); 
 
         // 1. EXIT SCREEN FUNCTIONALITY
         function showExitScreen() {
@@ -546,7 +540,7 @@
                     window.history.replaceState({}, document.title, cleanUrl);
                 }
 
-                showResearcherUI(); // <-- CHANGE 3: CALL TO SHOW RESEARCHER UI
+                showResearcherUI(); 
 
                 onAuthStateChanged(auth, async (user) => {
                     if (user) {
@@ -571,10 +565,10 @@
         }
         
         // -----------------------------------------------------------------
-        // --- START: RESEARCHER DASHBOARD & EXPORT (NEW CODE - CHANGE 3) ---
+        // --- START: RESEARCHER DASHBOARD & EXPORT (FROM PREVIOUS STEP) ---
         // -----------------------------------------------------------------
 
-        let resultsListener = null; // Manages the realtime listener
+        let resultsListener = null; 
 
         /**
          * Toggles between the main survey and the researcher results dashboard.
@@ -895,7 +889,7 @@
         }
 
         // -----------------------------------------------------------------
-        // --- END: RESEARCHER DASHBOARD & EXPORT (NEW CODE) ---
+        // --- END: RESEARCHER DASHBOARD & EXPORT ---
         // -----------------------------------------------------------------
 
         // Start the application
