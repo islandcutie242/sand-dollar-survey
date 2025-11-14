@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sand Dollar Consumer Adoption Survey</title>
-    <!-- Using Tailwind CSS CDN for development (you can install properly for production) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
@@ -32,7 +31,6 @@
 <body class="p-4 sm:p-8">
     <div class="max-w-3xl mx-auto bg-white p-6 sm:p-10 rounded-xl shadow-2xl border border-gray-100">
         
-        <!-- Exit Screen (Hidden by default) -->
         <div id="exitScreen" class="hidden text-center py-16">
             <div class="bg-green-50 border border-green-200 rounded-xl p-8 max-w-2xl mx-auto">
                 <div class="text-6xl mb-4">✅</div>
@@ -42,7 +40,6 @@
             </div>
         </div>
 
-        <!-- Main Survey Content -->
         <div id="surveyContent">
             <header class="mb-8 border-b pb-4">
                 <h1 class="text-3xl font-extrabold text-gray-900 mb-2">Sand Dollar Consumer Adoption Survey</h1>
@@ -59,7 +56,6 @@
             </div>
 
             <form id="sandDollarSurveyForm" class="space-y-10">
-                <!-- Consent Section -->
                 <section id="section-consent">
                     <h3 class="text-xl font-bold text-gray-700 mb-4">Start of Survey: Consent</h3>
                     <p class="text-base text-gray-600 mb-4">0.0. Permission to Complete Survey</p>
@@ -71,7 +67,6 @@
                         <label for="consent_no" class="px-6 py-3 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">No, I do not consent</label>
                     </div>
                     
-                    <!-- Continue Button (Hidden until consent is given) -->
                     <div id="continueButtonContainer" class="hidden mt-6 text-center">
                         <button type="button" id="continueButton" class="bg-green-600 text-white font-bold py-3 px-8 rounded-xl hover:bg-green-700 transition-colors shadow-lg shadow-green-500/50">
                             Continue to Survey Questions
@@ -79,15 +74,11 @@
                     </div>
                 </section>
 
-                <!-- Survey Questions Section (Hidden until consent is given) -->
                 <div id="surveyQuestions" class="hidden">
-                    <!-- Your existing survey questions go here -->
-                    <!-- Demographic Information -->
                     <section id="section-demographics">
                         <h3 class="text-xl font-bold text-gray-700 mb-4 border-t pt-6">Section 0: Demographic Information</h3>
                         <p class="text-sm text-gray-600 mb-6">These questions help us understand if adoption barriers or incentives vary across different groups.</p>
 
-                        <!-- Gender -->
                         <div class="mb-6">
                             <label class="block text-gray-800 font-semibold mb-3 required-field">A. Gender:</label>
                             <div class="flex flex-wrap gap-4">
@@ -100,7 +91,6 @@
                             </div>
                         </div>
 
-                        <!-- Age Range -->
                         <div class="mb-6">
                             <label class="block text-gray-800 font-semibold mb-3 required-field">B. Age Range:</label>
                             <div class="flex flex-wrap gap-4">
@@ -117,7 +107,6 @@
                             </div>
                         </div>
 
-                        <!-- Employment Status -->
                         <div class="mb-6">
                             <label class="block text-gray-800 font-semibold mb-3 required-field">C. Employment Status:</label>
                             <div class="flex flex-wrap gap-4">
@@ -136,7 +125,6 @@
                             </div>
                         </div>
 
-                        <!-- Education -->
                         <div class="mb-6">
                             <label class="block text-gray-800 font-semibold mb-3 required-field">D. Highest Level of Education Completed:</label>
                             <div class="flex flex-wrap gap-4">
@@ -154,7 +142,6 @@
                         </div>
                     </section>
 
-                    <!-- Likert Scale Legend -->
                     <div class="flex justify-between text-xs text-gray-600 font-medium px-4 py-2 bg-gray-100 rounded-lg shadow-inner">
                         <span class="text-red-600">1: Strongly Disagree</span>
                         <span>2: Disagree</span>
@@ -163,12 +150,10 @@
                         <span class="text-green-600">5: Strongly Agree</span>
                     </div>
 
-                    <!-- Section 1: Barriers -->
                     <section id="section-barriers">
                         <h3 class="text-xl font-bold text-gray-700 mb-6 border-t pt-6">Section 1: Identifying Current Barriers (Likert Scale)</h3>
                         <p class="text-sm text-gray-600 mb-8">These questions aim to understand why consumers aren't using the Sand Dollar right now.</p>
 
-                        <!-- Question 1 -->
                         <div class="mb-8">
                             <label class="block text-lg font-medium text-gray-800 mb-4 required-field">1. Barrier - Preference for Existing Methods:</label>
                             <p class="text-sm text-gray-600 mb-4">"I rarely use the Sand Dollar because my existing payment methods (cash, debit/credit card) are more convenient."</p>
@@ -186,7 +171,6 @@
                             </div>
                         </div>
 
-                        <!-- Question 2 -->
                         <div class="mb-8">
                             <label class="block text-lg font-medium text-gray-800 mb-4 required-field">2. Barrier - Merchant Acceptance:</label>
                             <p class="text-sm text-gray-600 mb-4">"Most of the businesses and merchants where I shop regularly do not accept the Sand Dollar."</p>
@@ -204,7 +188,6 @@
                             </div>
                         </div>
 
-                        <!-- Question 3 -->
                         <div class="mb-8">
                             <label class="block text-lg font-medium text-gray-800 mb-4 required-field">3. Barrier - Trust and Privacy:</label>
                             <p class="text-sm text-gray-600 mb-4">"I have concerns about the security or privacy of my money if I use the Sand Dollar."</p>
@@ -223,12 +206,10 @@
                         </div>
                     </section>
 
-                    <!-- Section 2: Incentives -->
                     <section id="section-incentives">
                         <h3 class="text-xl font-bold text-gray-700 mb-6 border-t pt-6">Section 2: Measuring Receptivity to Financial Incentives (Likert Scale)</h3>
                         <p class="text-sm text-gray-600 mb-8">These questions test whether financial incentives are the key missing piece for adoption.</p>
 
-                        <!-- Question 4 -->
                         <div class="mb-8">
                             <label class="block text-lg font-medium text-gray-800 mb-4 required-field">4. Incentive - General Receptivity:</label>
                             <p class="text-sm text-gray-600 mb-4">"I would be significantly more motivated to use the Sand Dollar if it offered me a direct financial benefit (e.g., discounts, rewards)."</p>
@@ -246,7 +227,6 @@
                             </div>
                         </div>
 
-                        <!-- Question 5 -->
                         <div class="mb-8">
                             <label class="block text-lg font-medium text-gray-800 mb-4 required-field">5. Incentive - Specific VAT Credit Impact:</label>
                             <p class="text-sm text-gray-600 mb-4">"I would choose to pay with the Sand Dollar for most purchases if the government offered a small VAT credit (e.g., 1%) on those transactions."</p>
@@ -264,7 +244,6 @@
                             </div>
                         </div>
 
-                        <!-- Question 6 -->
                         <div class="mb-8">
                             <label class="block text-lg font-medium text-gray-800 mb-4 required-field">6. Switching Behavior - Current Payment Methods:</label>
                             <p class="text-sm text-gray-600 mb-4">"If the Sand Dollar offered a VAT credit, I would switch from my current primary payment method (card or cash) to the Sand Dollar for daily expenses."</p>
@@ -282,7 +261,6 @@
                             </div>
                         </div>
 
-                        <!-- Question 7 -->
                         <div class="mb-8">
                             <label class="block text-lg font-medium text-gray-800 mb-4 required-field">7. Attitude - Importance of Financial Benefit:</label>
                             <p class="text-sm text-gray-600 mb-4">"For the Sand Dollar to be widely adopted, it needs to offer a greater financial advantage than commercial bank products."</p>
@@ -301,13 +279,11 @@
                         </div>
                     </section>
 
-                    <!-- Validation Message -->
                     <div id="validationMessage" class="hidden p-4 bg-red-50 border border-red-200 rounded-lg">
                         <p class="text-red-700 font-medium">Please complete all required questions before submitting the survey.</p>
                         <p class="text-red-600 text-sm mt-1">All questions marked with * are required.</p>
                     </div>
 
-                    <!-- Submit Button -->
                     <div class="border-t pt-6">
                         <button type="submit" id="submitButton" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/50">
                             Submit Survey
@@ -315,14 +291,16 @@
                     </div>
                 </div>
                 
-                <!-- Message Box -->
                 <div id="messageBox" class="p-4 mt-6 hidden" role="alert">
                     <p id="messageText" class="font-medium"></p>
                     <p class="text-sm mt-1" id="messageSubText"></p>
                 </div>
             </form>
         </div>
-    </div>
+        
+        <div id="resultsContainer" class="hidden">
+            </div>
+        </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -337,7 +315,8 @@
             addDoc, 
             query, 
             onSnapshot, 
-            serverTimestamp 
+            serverTimestamp,
+            getDocs // <-- CHANGE 1: ADDED getDocs
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
         const FIREBASE_CONFIG = {
@@ -373,6 +352,7 @@
         const submitButton = document.getElementById('submitButton');
         const consentNo = document.getElementById('consent_no');
         const consentYes = document.getElementById('consent_yes');
+        const resultsContainer = document.getElementById('resultsContainer'); // <-- CHANGE 3: ADDED resultsContainer
 
         // 1. EXIT SCREEN FUNCTIONALITY
         function showExitScreen() {
@@ -566,6 +546,8 @@
                     window.history.replaceState({}, document.title, cleanUrl);
                 }
 
+                showResearcherUI(); // <-- CHANGE 3: CALL TO SHOW RESEARCHER UI
+
                 onAuthStateChanged(auth, async (user) => {
                     if (user) {
                         userId = user.uid;
@@ -587,6 +569,334 @@
                 showMessage('error', 'Initialization Error', 'Failed to initialize Firebase. Check console for details.');
             }
         }
+        
+        // -----------------------------------------------------------------
+        // --- START: RESEARCHER DASHBOARD & EXPORT (NEW CODE - CHANGE 3) ---
+        // -----------------------------------------------------------------
+
+        let resultsListener = null; // Manages the realtime listener
+
+        /**
+         * Toggles between the main survey and the researcher results dashboard.
+         */
+        function switchView(view) {
+            if (view === 'results') {
+                console.log("Switching to Results View");
+                surveyContent.classList.add('hidden');
+                exitScreen.classList.add('hidden');
+                resultsContainer.classList.remove('hidden');
+                fetchAndDisplayResults(); // Load data when view is shown
+            } else { // 'survey'
+                console.log("Switching to Survey View");
+                surveyContent.classList.remove('hidden');
+                exitScreen.classList.add('hidden');
+                resultsContainer.classList.add('hidden');
+                
+                // Detach the listener when switching away from results to save resources
+                if (resultsListener) {
+                    resultsListener();
+                    resultsListener = null;
+                }
+            }
+        }
+
+        /**
+         * Checks if the user is the researcher (based on localStorage)
+         * and injects the "View Results" button if they are.
+         */
+        function showResearcherUI() {
+            // This relies on the RESEARCHER_USER_ID variable you set from localStorage
+            if (RESEARCHER_USER_ID) {
+                console.log("Researcher UI enabled.");
+                const header = document.querySelector('header.mb-8');
+                
+                // Inject the researcher control panel
+                const buttonHtml = `
+                    <div class="mt-6 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded-r-lg">
+                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center">
+                            <div>
+                                <h3 class="font-bold text-yellow-800">Researcher Dashboard</h3>
+                                <p class="text-yellow-700 text-sm">You are identified as the researcher. Click here to view live results.</p>
+                            </div>
+                            <button type="button" id="viewResultsButton" class="mt-2 sm:mt-0 flex-shrink-0 bg-blue-600 text-white font-bold py-2 px-4 rounded-xl hover:bg-blue-700 transition-colors">
+                                View Live Results
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                if (header) {
+                    header.insertAdjacentHTML('afterend', buttonHtml);
+                    // Add the click listener to the new button
+                    document.getElementById('viewResultsButton').addEventListener('click', () => switchView('results'));
+                }
+            } else {
+                console.log("Participant view. Researcher UI hidden.");
+            }
+        }
+
+        /**
+         * Aggregates simple counts (e.g., demographics)
+         */
+        function aggregateCounts(responses, key) {
+            return responses.reduce((acc, response) => {
+                const value = response[key] || 'Not Answered';
+                acc[value] = (acc[value] || 0) + 1;
+                return acc;
+            }, {});
+        }
+
+        /**
+         * Aggregates Likert scale questions (1-5) and calculates average
+         */
+        function aggregateLikert(responses, key) {
+            const distribution = { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0, 'N/A': 0 };
+            let sum = 0;
+            let count = 0;
+            
+            responses.forEach(response => {
+                const value = response[key]; // Your code correctly parses to int
+                if (value && distribution.hasOwnProperty(String(value))) {
+                    distribution[String(value)]++;
+                    sum += value;
+                    count++;
+                } else {
+                    distribution['N/A']++;
+                }
+            });
+            
+            const average = count > 0 ? (sum / count).toFixed(2) : 'N/A';
+            return { distribution, average, total: count };
+        }
+
+        /**
+         * Renders a bar chart for demographic data
+         */
+        function renderChart(title, data, total) {
+            let chartHTML = `<div class="mb-6 p-4 border rounded-lg"><h4 class="font-semibold text-gray-700 mb-3">${title}</h4>`;
+            const sortedData = Object.entries(data).sort((a, b) => b[1] - a[1]); 
+
+            for (const [label, count] of sortedData) {
+                const percentage = total > 0 ? ((count / total) * 100).toFixed(1) : 0;
+                chartHTML += `
+                    <div class="mb-2">
+                        <div class="flex justify-between text-sm text-gray-600 mb-1">
+                            <span class="font-medium">${label}</span>
+                            <span class="text-gray-800 font-bold">${count} <span class="font-normal text-gray-500">(${percentage}%)</span></span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5">
+                            <div class="bg-blue-500 h-2.5 rounded-full" style="width: ${percentage}%"></div>
+                        </div>
+                    </div>
+                `;
+            }
+            chartHTML += '</div>';
+            return chartHTML;
+        }
+        
+        /**
+         * Renders a stacked bar for Likert data
+         */
+        function renderLikertChart(title, questionText, stats) {
+            const { distribution, average, total } = stats;
+            const colors = { '1': 'bg-red-600', '2': 'bg-red-400', '3': 'bg-yellow-400', '4': 'bg-green-400', '5': 'bg-green-600' };
+            let chartHTML = `<div class="mb-6 p-4 border rounded-lg shadow-sm">
+                <h4 class="font-bold text-gray-800 mb-1">${title}</h4>
+                <p class="text-sm italic text-gray-500 mb-3">"${questionText}"</p>
+                <div class="flex justify-between font-medium text-sm mb-2 text-gray-700">
+                    <span>Total Responses: <span class="font-bold text-black">${total}</span></span>
+                    <span>Average Score: <span class="font-bold text-black">${average}</span></span>
+                </div>
+                <div class="w-full flex rounded-full h-4 bg-gray-200 overflow-hidden" role="progressbar">`;
+            
+            const labels = { '1': 'Strongly Disagree', '2': 'Disagree', '3': 'Neutral', '4': 'Agree', '5': 'Strongly Agree' };
+
+            for (let i = 1; i <= 5; i++) {
+                const count = distribution[String(i)];
+                const percentage = total > 0 ? ((count / total) * 100) : 0;
+                if (percentage > 0) {
+                    chartHTML += `<div class="${colors[i]}" style="width: ${percentage}%" title="${labels[i]}: ${count} responses (${percentage.toFixed(1)}%)"></div>`;
+                }
+            }
+            chartHTML += `</div>
+                <div class="flex justify-between text-xs text-gray-500 mt-1 px-1">
+                    <span class="text-red-600 font-medium">Strongly Disagree (1)</span>
+                    <span class="text-green-600 font-medium">Strongly Agree (5)</span>
+                </div>
+            </div>`;
+            return chartHTML;
+        }
+
+        /**
+         * Fetches all data and builds the results dashboard
+         */
+        function fetchAndDisplayResults() {
+            if (!db) {
+                resultsContainer.innerHTML = '<p class="text-center text-red-500 py-10">Database connection is not available.</p>';
+                return;
+            }
+            if (resultsListener) {
+                resultsListener(); // Detach previous listener
+            }
+            
+            resultsContainer.innerHTML = '<p class="text-center text-gray-500 py-10">Loading live results...</p>';
+            
+            const q = query(collection(db, COLLECTION_PATH));
+            
+            resultsListener = onSnapshot(q, (snapshot) => {
+                if (snapshot.empty) {
+                    resultsContainer.innerHTML = '<p class="text-center text-gray-500 py-10">No survey responses submitted yet.</p>';
+                    return;
+                }
+                
+                const responses = snapshot.docs
+                    .map(doc => doc.data())
+                    .filter(response => response.consent === 'Yes'); // Only show consented data
+                    
+                const totalResponses = responses.length;
+                
+                if (totalResponses === 0) {
+                    resultsContainer.innerHTML = `
+                        <div class="flex justify-between items-center mb-8 border-b pb-4">
+                             <h2 class="text-3xl font-extrabold text-gray-900">Live Survey Results</h2>
+                             <button type="button" id="backToSurveyButton" class="bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-xl hover:bg-gray-300">
+                                Back to Survey
+                            </button>
+                        </div>
+                        <p class="text-center text-gray-500 py-10">No participants have consented to the survey yet.</p>
+                    `;
+                    document.getElementById('backToSurveyButton').addEventListener('click', () => switchView('survey'));
+                    return;
+                }
+                
+                resultsContainer.innerHTML = `
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-8 border-b pb-4 gap-4">
+                        <div>
+                            <h2 class="text-3xl font-extrabold text-gray-900 mb-2">Live Survey Results</h2>
+                            <p class="text-lg text-gray-500">Total Valid Responses: <span class="font-bold text-gray-900">${totalResponses}</span></p>
+                        </div>
+                        <div class="flex flex-col sm:flex-row gap-2">
+                            <button type="button" id="exportCsvButton" class="w-full sm:w-auto bg-green-600 text-white font-bold py-2 px-4 rounded-xl hover:bg-green-700 transition-colors">
+                                Export to CSV
+                            </button>
+                            <button type="button" id="backToSurveyButton" class="w-full sm:w-auto bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-xl hover:bg-gray-300 transition-colors">
+                                Back to Survey
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                document.getElementById('backToSurveyButton').addEventListener('click', () => switchView('survey'));
+                document.getElementById('exportCsvButton').addEventListener('click', exportDataToCSV);
+
+                // --- Demographics ---
+                const demographicsSection = document.createElement('section');
+                demographicsSection.innerHTML = '<h3 class="text-2xl font-bold text-gray-800 mb-4">Section 0: Demographics</h3>';
+                const demoData = {
+                    'A. Gender': aggregateCounts(responses, 'gender'),
+                    'B. Age Range': aggregateCounts(responses, 'age'),
+                    'C. Employment Status': aggregateCounts(responses, 'employment'),
+                    'D. Education Level': aggregateCounts(responses, 'education')
+                };
+                const demoContainer = document.createElement('div');
+                demoContainer.className = 'grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2';
+                for (const [title, data] of Object.entries(demoData)) {
+                    demoContainer.innerHTML += renderChart(title, data, totalResponses);
+                }
+                demographicsSection.appendChild(demoContainer);
+                resultsContainer.appendChild(demographicsSection);
+                
+                // --- Barriers ---
+                const barriersSection = document.createElement('section');
+                barriersSection.innerHTML = '<h3 class="text-2xl font-bold text-gray-800 mb-6 border-t pt-8 mt-8">Section 1: Current Barriers</h3>';
+                barriersSection.innerHTML += renderLikertChart('1. Preference for Existing Methods', '...my existing payment methods... are more convenient.', aggregateLikert(responses, 'q1_preference'));
+                barriersSection.innerHTML += renderLikertChart('2. Merchant Acceptance', '...businesses... do not accept the Sand Dollar.', aggregateLikert(responses, 'q2_acceptance'));
+                barriersSection.innerHTML += renderLikertChart('3. Trust and Privacy', 'I have concerns about the security or privacy...', aggregateLikert(responses, 'q3_trust'));
+                resultsContainer.appendChild(barriersSection);
+
+                // --- Incentives ---
+                const incentivesSection = document.createElement('section');
+                incentivesSection.innerHTML = '<h3 class="text-2xl font-bold text-gray-800 mb-6 border-t pt-8 mt-8">Section 2: Receptivity to Incentives</h3>';
+                incentivesSection.innerHTML += renderLikertChart('4. General Receptivity', '...more motivated... if it offered a direct financial benefit.', aggregateLikert(responses, 'q4_general_incentive'));
+                incentivesSection.innerHTML += renderLikertChart('5. Specific VAT Credit Impact', '...choose to pay with Sand Dollar if... offered a small VAT credit.', aggregateLikert(responses, 'q5_vat_credit'));
+                incentivesSection.innerHTML += renderLikertChart('6. Switching Behavior', '...I would switch from my current... method to the Sand Dollar.', aggregateLikert(responses, 'q6_switching'));
+                incentivesSection.innerHTML += renderLikertChart('7. Importance of Financial Benefit', '...needs to offer a greater financial advantage...', aggregateLikert(responses, 'q7_importance'));
+                resultsContainer.appendChild(incentivesSection);
+                
+            }, (error) => {
+                console.error("Error fetching results: ", error);
+                resultsContainer.innerHTML = `<p class="text-center text-red-600 py-10">Error loading results: ${error.message}</p>`;
+            });
+        }
+
+        /**
+         * Fetches all data (using getDocs) and triggers a CSV download
+         */
+        async function exportDataToCSV() {
+            console.log("Starting CSV export...");
+            const exportButton = document.getElementById('exportCsvButton');
+            exportButton.textContent = "Exporting...";
+            exportButton.disabled = true;
+
+            try {
+                // Use your exact data field names from the submission handler
+                const headers = [
+                    'submittedBy', 'consent', 'gender', 'age', 'employment', 'education', 
+                    'q1_preference', 'q2_acceptance', 'q3_trust',
+                    'q4_general_incentive', 'q5_vat_credit', 'q6_switching', 'q7_importance',
+                    'timestamp'
+                ];
+
+                let csvContent = headers.join(',') + '\r\n'; 
+
+                const q = query(collection(db, COLLECTION_PATH));
+                const querySnapshot = await getDocs(q);
+                
+                const allDocs = querySnapshot.docs
+                    .map(doc => doc.data())
+                    .filter(response => response.consent === 'Yes'); // Only export consented data
+
+                allDocs.forEach(doc => {
+                    const row = headers.map(header => {
+                        let value = doc[header];
+
+                        if (value === undefined || value === null) {
+                            return '""';
+                        }
+                        // Convert Firestore Timestamp to a readable date
+                        if (header === 'timestamp' && value && typeof value.toDate === 'function') {
+                            value = value.toDate().toISOString();
+                        }
+                        // Wrap all values in quotes
+                        return `"${String(value).replace(/"/g, '""')}"`;
+                    });
+                    csvContent += row.join(',') + '\r\n';
+                });
+
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', 'sand_dollar_survey_responses.csv');
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                console.log("Export complete.");
+                exportButton.textContent = "Export to CSV";
+                exportButton.disabled = false;
+
+            } catch (error) {
+                console.error("Error exporting CSV: ", error);
+                exportButton.textContent = "Export Failed";
+                exportButton.classList.add('bg-red-500');
+            }
+        }
+
+        // -----------------------------------------------------------------
+        // --- END: RESEARCHER DASHBOARD & EXPORT (NEW CODE) ---
+        // -----------------------------------------------------------------
 
         // Start the application
         window.addEventListener('DOMContentLoaded', initializeFirebase);
